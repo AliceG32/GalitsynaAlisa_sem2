@@ -23,4 +23,11 @@ public class CourseService {
         log.info("Course with id: {} created successfully", Course.getId());
         return id;
     }
+    public void deleteById(Long id) throws EntityNotFound {
+        repository.deleteById(id);
+    }
+
+    public void update(Course course) throws EntityNotFound {
+        repository.update(course);
+    }
 }

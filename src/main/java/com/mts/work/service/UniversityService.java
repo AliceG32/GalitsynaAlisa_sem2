@@ -1,5 +1,6 @@
 package com.mts.work.service;
 
+import com.mts.work.entity.Book;
 import com.mts.work.entity.University;
 import com.mts.work.repository.UniversityRepository;
 import com.mts.work.repository.exception.EntityNotFound;
@@ -22,5 +23,12 @@ public class UniversityService {
 
         log.info("University with id: {} created successfully", University.getId());
         return id;
+    }
+    public void deleteById(Long id) throws EntityNotFound {
+        repository.deleteById(id);
+    }
+
+    public void update(University university) throws EntityNotFound {
+        repository.update(university);
     }
 }

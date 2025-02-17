@@ -24,4 +24,12 @@ public class UserService {
         log.info("User with id: {} created successfully", User.getId());
         return id;
     }
+
+    public void deleteById(Long id) throws EntityNotFound {
+        repository.deleteById(id);
+    }
+
+    public void update(User user) throws EntityNotFound {
+        repository.update(user);
+    }
 }

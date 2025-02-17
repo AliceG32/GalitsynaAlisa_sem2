@@ -7,4 +7,7 @@ public interface CourseRepository {
     long create(Course user);
 
     Course getById(long id) throws EntityNotFound;
+    void deleteById(long id) throws EntityNotFound;
+    void update(Course course) throws EntityNotFound;
+
 }

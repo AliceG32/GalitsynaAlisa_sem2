@@ -30,4 +30,21 @@ public class InMemoryUniversityRepository implements UniversityRepository {
       throw new EntityNotFound("Cannot find university by id=" + id);
     }
   }
+  @Override
+  public void deleteById(long id) throws EntityNotFound {
+    if (data.containsKey(id)) {
+      data.remove(id);
+    } else {
+      throw new EntityNotFound("Cannot find university by id=" + id);
+    }
+  }
+
+  @Override
+  public void update(University university) throws EntityNotFound {
+    if (data.containsKey(university.getId().getValue())) {
+      data.put(university.getId().getValue(), university);
+    } else {
+      throw new EntityNotFound("Cannot find university by id=" + university.getId());
+    }
+  }
 }

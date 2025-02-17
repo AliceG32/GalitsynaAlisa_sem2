@@ -1,18 +1,22 @@
 package com.mts.work.controller;
 
 import com.mts.work.repository.exception.EntityNotFound;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
+@Hidden
 public class GlobalExceptionHandler {
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(EntityNotFound.class)
     public ResponseEntity<String> handleEntityNotFoundExceptions(EntityNotFound ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
-    public ResponseEntity<String> handleAllExceptions(Exception ex) {
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<String> handleAllExceptions(Throwable ex) {
         return ResponseEntity.internalServerError().body(ex.getMessage());
     }
 }
