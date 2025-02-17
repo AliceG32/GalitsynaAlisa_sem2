@@ -30,4 +30,22 @@ public class InMemoryUserRepository implements UserRepository {
       throw new EntityNotFound("Cannot find user by id=" + id);
     }
   }
+
+  @Override
+  public void deleteById(long id) throws EntityNotFound {
+    if (data.containsKey(id)) {
+      data.remove(id);
+    } else {
+      throw new EntityNotFound("Cannot find user by id=" + id);
+    }
+  }
+
+  @Override
+  public void update(User user) throws EntityNotFound {
+    if (data.containsKey(user.getId().getValue())) {
+      data.put(user.getId().getValue(), user);
+    } else {
+      throw new EntityNotFound("Cannot find user by id=" + user.getId());
+    }
+  }
 }

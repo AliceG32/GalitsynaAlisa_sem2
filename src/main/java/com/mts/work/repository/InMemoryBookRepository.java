@@ -30,4 +30,22 @@ public class InMemoryBookRepository implements BookRepository {
       throw new EntityNotFound("Cannot find book by id=" + id);
     }
   }
+
+  @Override
+  public void deleteById(long id) throws EntityNotFound {
+    if (data.containsKey(id)) {
+      data.remove(id);
+    } else {
+      throw new EntityNotFound("Cannot find book by id=" + id);
+    }
+  }
+
+  @Override
+  public void update(Book book) throws EntityNotFound {
+    if (data.containsKey(book.getId().getValue())) {
+      data.put(book.getId().getValue(), book);
+    } else {
+      throw new EntityNotFound("Cannot find book by id=" + book.getId());
+    }
+  }
 }

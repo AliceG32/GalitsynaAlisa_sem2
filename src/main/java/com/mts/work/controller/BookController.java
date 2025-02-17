@@ -10,21 +10,35 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/book")
 @RequiredArgsConstructor
 @Validated
-public class BookController {
+public class BookController implements BookOperation {
     private final BookService bookService;
 
-    @GetMapping("/{id}")
+    @Override
     public ResponseEntity<Book> getBookById(@PathVariable Long id) throws EntityNotFound {
         return ResponseEntity.ok().body(bookService.getById(id));
     }
 
-    @PostMapping("")
+    @Override
     public ResponseEntity<String> saveBook(@RequestBody Book book)
     {
         long id = bookService.create(book);
         return new ResponseEntity<>("Book created! ID: " + id, HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteBookById(@PathVariable Long id) throws EntityNotFound {
+        bookService.deleteById(id);
+        return new ResponseEntity<>("Book deleted! ID: " + id, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> updateBook(@PathVariable Long id, @RequestBody Book Book) throws EntityNotFound {
+        Book book = bookService.getById(id);
+        Book.setId(book.getId());
+        Book.setUserId(book.getUserId());
+        bookService.update(Book);
+        return new ResponseEntity<>("Book updated! ID: " + id, HttpStatus.OK);
     }
 }

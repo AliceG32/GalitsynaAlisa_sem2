@@ -1,5 +1,7 @@
 package com.mts.work.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class University {
+    @JsonIgnore
+    @Hidden
     private UniversityId id;
     private String name;
-    private UserId userId;
+    private int userId;
 }

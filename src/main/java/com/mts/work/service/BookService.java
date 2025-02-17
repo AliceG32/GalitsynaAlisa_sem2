@@ -1,6 +1,7 @@
 package com.mts.work.service;
 
 import com.mts.work.entity.Book;
+import com.mts.work.entity.User;
 import com.mts.work.repository.BookRepository;
 import com.mts.work.repository.exception.EntityNotFound;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,13 @@ public class BookService {
 
         log.info("Book with id: {} created successfully", Book.getId());
         return id;
+    }
+
+    public void deleteById(Long id) throws EntityNotFound {
+        repository.deleteById(id);
+    }
+
+    public void update(Book book) throws EntityNotFound {
+        repository.update(book);
     }
 }

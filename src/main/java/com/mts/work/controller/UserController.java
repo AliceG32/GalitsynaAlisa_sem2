@@ -11,21 +11,34 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/user")
 @RequiredArgsConstructor
 @Validated
-public class UserController {
+public class UserController implements UserOperation {
     private final UserService userService;
 
-    @GetMapping("/{id}")
+    @Override
     public ResponseEntity<User> getUserById(@PathVariable Long id) throws EntityNotFound {
         return ResponseEntity.ok().body(userService.getById(id));
     }
 
-    @PostMapping("")
+    @Override
     public ResponseEntity<String> saveUser(@RequestBody User user)
     {
         long id = userService.create(user);
         return new ResponseEntity<>("User created! ID: " + id, HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id) throws EntityNotFound {
+        userService.deleteById(id);
+        return new ResponseEntity<>("User deleted! ID: " + id, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User User) throws EntityNotFound {
+        User user = userService.getById(id);
+        User.setId(user.getId());
+        userService.update(User);
+        return new ResponseEntity<>("User updated! ID: " + id, HttpStatus.OK);
     }
 }

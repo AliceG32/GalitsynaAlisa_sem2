@@ -1,6 +1,7 @@
 package com.mts.work.repository;
 
 import com.mts.work.entity.Course;
+import com.mts.work.entity.Course;
 import com.mts.work.entity.CourseId;
 import com.mts.work.repository.exception.EntityNotFound;
 import org.springframework.stereotype.Repository;
@@ -28,6 +29,23 @@ public class InMemoryCourseRepository implements CourseRepository {
       return data.get(id);
     } else {
       throw new EntityNotFound("Cannot find course by id=" + id);
+    }
+  }
+  @Override
+  public void deleteById(long id) throws EntityNotFound {
+    if (data.containsKey(id)) {
+      data.remove(id);
+    } else {
+      throw new EntityNotFound("Cannot find course by id=" + id);
+    }
+  }
+
+  @Override
+  public void update(Course course) throws EntityNotFound {
+    if (data.containsKey(course.getId().getValue())) {
+      data.put(course.getId().getValue(), course);
+    } else {
+      throw new EntityNotFound("Cannot find course by id=" + course.getId());
     }
   }
 }
