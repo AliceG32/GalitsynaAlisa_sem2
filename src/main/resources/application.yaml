@@ -1,3 +1,12 @@
 spring:
   application:
-   name: "mts"
+    name: "mts"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /admin
+  endpoint:
+    shutdown:
+      access: none
