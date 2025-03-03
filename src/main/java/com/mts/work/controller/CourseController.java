@@ -3,6 +3,7 @@ package com.mts.work.controller;
 import com.mts.work.entity.Course;
 import com.mts.work.repository.exception.EntityNotFound;
 import com.mts.work.service.CourseService;
+import io.github.resilience4j.ratelimiter.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,27 +15,53 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class CourseController implements CourseOperation {
     private final CourseService courseService;
+    private final RateLimiter rateLimiter = RateLimiter.ofDefaults("apiRateLimiter");
 
     public ResponseEntity<Course> getCourseById(@PathVariable Long id) throws EntityNotFound {
-        return ResponseEntity.ok().body(courseService.getById(id));
+        return rateLimiter.executeSupplier(() -> {
+          try {
+            return ResponseEntity.ok().body(courseService.getById(id));
+          } catch (EntityNotFound e) {
+            throw new RuntimeException(e);
+          }
+        });
     }
 
     public ResponseEntity<String> saveCourse(@RequestBody Course course)
     {
-        long id = courseService.create(course);
-        return new ResponseEntity<>("Course created! ID: " + id, HttpStatus.CREATED);
+        return rateLimiter.executeSupplier(() -> {
+          long id = courseService.create(course);
+          return new ResponseEntity<>("Course created! ID: " + id, HttpStatus.CREATED);
+        });
     }
 
     public ResponseEntity<String> deleteCourseById(@PathVariable Long id) throws EntityNotFound {
-        courseService.deleteById(id);
-        return new ResponseEntity<>("Course deleted! ID: " + id, HttpStatus.OK);
+        return rateLimiter.executeSupplier(() -> {
+          try {
+            courseService.deleteById(id);
+          } catch (EntityNotFound e) {
+            throw new RuntimeException(e);
+          }
+          return new ResponseEntity<>("Course deleted! ID: " + id, HttpStatus.OK);
+        });
     }
 
     public ResponseEntity<String> updateCourse(@PathVariable Long id, @RequestBody Course Course) throws EntityNotFound {
-        Course course = courseService.getById(id);
-        Course.setId(course.getId());
-        Course.setUserId(course.getUserId());
-        courseService.update(Course);
-        return new ResponseEntity<>("Course updated! ID: " + id, HttpStatus.OK);
+        return rateLimiter.executeSupplier(() -> {
+          Course course = null;
+          try {
+            course = courseService.getById(id);
+          } catch (EntityNotFound e) {
+            throw new RuntimeException(e);
+          }
+          Course.setId(course.getId());
+            Course.setUserId(course.getUserId());
+          try {
+            courseService.update(Course);
+          } catch (EntityNotFound e) {
+            throw new RuntimeException(e);
+          }
+          return new ResponseEntity<>("Course updated! ID: " + id, HttpStatus.OK);
+        });
     }
 }
