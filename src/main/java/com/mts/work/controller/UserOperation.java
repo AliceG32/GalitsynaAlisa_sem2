@@ -23,6 +23,18 @@ public interface UserOperation {
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     ResponseEntity<User> getUserById(@PathVariable Long id) throws EntityNotFound;
 
+    @GetMapping("/rest-template/{id}")
+    @Operation(summary = "Получить пользователя по ID (RestTemplate)")
+    @ApiResponse(responseCode = "200", description = "Пользователь найден")
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    User getUserByIdRestTemplate(@PathVariable Long id) throws EntityNotFound;
+
+    @GetMapping("/web-client/{id}")
+    @Operation(summary = "Получить пользователя по ID (WebClient)")
+    @ApiResponse(responseCode = "200", description = "Пользователь найден")
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    User getUserByIdWebClient(@PathVariable Long id) throws EntityNotFound;
+
     @PostMapping("")
     @Operation(summary = "Создать пользователя по ID")
     @ApiResponse(responseCode = "200", description = "Пользователь создан")

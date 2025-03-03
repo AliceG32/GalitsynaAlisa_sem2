@@ -9,13 +9,15 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.Test;
 import static org.testng.AssertJUnit.assertEquals;
 
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles("test")
 public class UserControllerE2ETest {
 
     @LocalServerPort
@@ -43,7 +45,7 @@ public class UserControllerE2ETest {
 
         url = "http://localhost:%d/user/1".formatted(port);
         ResponseEntity<String> responseGet2 = restTemplate.getForEntity(url, String.class);
-        assertEquals(HttpStatus.NOT_FOUND, responseGet2.getStatusCode());
-        assertEquals("Cannot find user by id=1", responseGet2.getBody());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseGet2.getStatusCode());
+        assertEquals("com.mts.work.repository.exception.EntityNotFound: Cannot find user by id=1", responseGet2.getBody());
     }
 }

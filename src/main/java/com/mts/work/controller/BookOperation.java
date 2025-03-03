@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.concurrent.CompletableFuture;
+
 @RequestMapping("/book")
 @Tag(name = "Book API", description = "Управление книгами")
 public interface BookOperation {
@@ -26,7 +28,7 @@ public interface BookOperation {
   @PostMapping("")
   @Operation(summary = "Создать книгу по ID")
   @ApiResponse(responseCode = "200", description = "Книга создана")
-  ResponseEntity<String> saveBook(@RequestBody Book book);
+  CompletableFuture<ResponseEntity<String>> saveBook(@RequestBody Book book);
 
   @DeleteMapping("/{id}")
   @Operation(summary = "Удалить книгу по ID")
