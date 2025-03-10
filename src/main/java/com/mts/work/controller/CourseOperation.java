@@ -21,7 +21,7 @@ public interface CourseOperation {
     @Operation(summary = "Получить курс по ID")
     @ApiResponse(responseCode = "200", description = "Курс найден")
     @ApiResponse(responseCode = "404", description = "Курс не найден")
-    ResponseEntity<Course> getCourseById(@PathVariable Long id) throws EntityNotFound;
+    ResponseEntity<Course> getCourseById(@PathVariable Integer id) throws EntityNotFound;
 
     @PostMapping("")
     @Operation(summary = "Создать курс по ID")
@@ -32,11 +32,11 @@ public interface CourseOperation {
     @Operation(summary = "Удалить курс по ID")
     @ApiResponse(responseCode = "200", description = "Курс удален")
     @ApiResponse(responseCode = "404", description = "Курс не найден")
-    ResponseEntity<String> deleteCourseById(@PathVariable Long id) throws EntityNotFound;
+    ResponseEntity<String> deleteCourseById(@PathVariable Integer id) throws EntityNotFound;
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменить курс по ID")
     @ApiResponse(responseCode = "200", description = "Курс изменен")
     @ApiResponse(responseCode = "404", description = "Курс не найден")
-    ResponseEntity<String> updateCourse(@PathVariable Long id, @RequestBody Course Course) throws EntityNotFound;
+    ResponseEntity<String> updateCourse(@PathVariable Integer id, @RequestBody Course Course) throws EntityNotFound;
 }

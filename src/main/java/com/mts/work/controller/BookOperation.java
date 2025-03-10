@@ -23,7 +23,7 @@ public interface BookOperation {
   @Operation(summary = "Получить книгу по ID")
   @ApiResponse(responseCode = "200", description = "Книга найдена")
   @ApiResponse(responseCode = "404", description = "Книга не найдена")
-  ResponseEntity<Book> getBookById(@PathVariable Long id) throws EntityNotFound;
+  ResponseEntity<Book> getBookById(@PathVariable Integer id) throws EntityNotFound;
 
   @PostMapping("")
   @Operation(summary = "Создать книгу по ID")
@@ -34,11 +34,11 @@ public interface BookOperation {
   @Operation(summary = "Удалить книгу по ID")
   @ApiResponse(responseCode = "200", description = "Книга удалена")
   @ApiResponse(responseCode = "404", description = "Книга не найдена")
-  ResponseEntity<String> deleteBookById(@PathVariable Long id) throws EntityNotFound;
+  ResponseEntity<String> deleteBookById(@PathVariable Integer id) throws EntityNotFound;
 
   @PutMapping("/{id}")
   @Operation(summary = "Изменить книгу по ID")
   @ApiResponse(responseCode = "200", description = "Книга изменена")
   @ApiResponse(responseCode = "404", description = "Книга не найдена")
-  ResponseEntity<String> updateBook(@PathVariable Long id, @RequestBody Book Book) throws EntityNotFound;
+  ResponseEntity<String> updateBook(@PathVariable Integer id, @RequestBody Book Book) throws EntityNotFound;
 }

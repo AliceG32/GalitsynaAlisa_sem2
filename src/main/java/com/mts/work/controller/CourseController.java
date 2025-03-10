@@ -17,7 +17,7 @@ public class CourseController implements CourseOperation {
     private final CourseService courseService;
     private final RateLimiter rateLimiter = RateLimiter.ofDefaults("apiRateLimiter");
 
-    public ResponseEntity<Course> getCourseById(@PathVariable Long id) throws EntityNotFound {
+    public ResponseEntity<Course> getCourseById(@PathVariable Integer id){
         return rateLimiter.executeSupplier(() -> {
           try {
             return ResponseEntity.ok().body(courseService.getById(id));
@@ -35,7 +35,7 @@ public class CourseController implements CourseOperation {
         });
     }
 
-    public ResponseEntity<String> deleteCourseById(@PathVariable Long id) throws EntityNotFound {
+    public ResponseEntity<String> deleteCourseById(@PathVariable Integer id){
         return rateLimiter.executeSupplier(() -> {
           try {
             courseService.deleteById(id);
@@ -46,7 +46,7 @@ public class CourseController implements CourseOperation {
         });
     }
 
-    public ResponseEntity<String> updateCourse(@PathVariable Long id, @RequestBody Course Course) throws EntityNotFound {
+    public ResponseEntity<String> updateCourse(@PathVariable Integer id, @RequestBody Course Course) {
         return rateLimiter.executeSupplier(() -> {
           Course course = null;
           try {
