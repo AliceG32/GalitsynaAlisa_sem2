@@ -21,7 +21,7 @@ public interface UniversityOperation {
     @Operation(summary = "Получить университет по ID")
     @ApiResponse(responseCode = "200", description = "Университет найден")
     @ApiResponse(responseCode = "404", description = "Университет не найден")
-    ResponseEntity<University> getUniversityById(@PathVariable Long id) throws EntityNotFound;
+    ResponseEntity<University> getUniversityById(@PathVariable Integer id) throws EntityNotFound;
 
     @PostMapping("")
     @Operation(summary = "Создать университет по ID")
@@ -32,11 +32,11 @@ public interface UniversityOperation {
     @Operation(summary = "Удалить университет по ID")
     @ApiResponse(responseCode = "200", description = "Университет удален")
     @ApiResponse(responseCode = "404", description = "Университет не найден")
-    ResponseEntity<String> deleteUniversityById(@PathVariable Long id) throws EntityNotFound;
+    ResponseEntity<String> deleteUniversityById(@PathVariable Integer id) throws EntityNotFound;
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменить университет по ID")
     @ApiResponse(responseCode = "200", description = "Университет изменена")
     @ApiResponse(responseCode = "404", description = "Университет не найдена")
-    ResponseEntity<String> updateUniversity(@PathVariable Long id, @RequestBody University University) throws EntityNotFound;
+    ResponseEntity<String> updateUniversity(@PathVariable Integer id, @RequestBody University University) throws EntityNotFound;
 }

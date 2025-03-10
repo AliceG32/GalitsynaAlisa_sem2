@@ -2,7 +2,6 @@ package com.mts.work.mvc;
 
 import com.mts.work.controller.UserController;
 import com.mts.work.entity.User;
-import com.mts.work.entity.UserId;
 import com.mts.work.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,7 +23,7 @@ class UserControllerMvcTest {
     @MockitoBean
     private UserService userService;
 
-    private static final User USER_MOCK = new User(new UserId(1), "User name");
+    private static final User USER_MOCK = new User(2, "User name");
     private static final String USER_JSON = "{\"name\":\"Test\"}";
 
     @Test
@@ -35,7 +34,7 @@ class UserControllerMvcTest {
 
     @Test
     public void getUser() throws Exception {
-        Long id = 0L;
+        Integer id = 0;
         doReturn(id).when(userService).create(USER_MOCK);
         mockMvc.perform(get("/user/1").contentType("application/json"))
                 .andExpect(status().isOk());

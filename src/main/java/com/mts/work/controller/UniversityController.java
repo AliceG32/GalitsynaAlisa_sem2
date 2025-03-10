@@ -17,7 +17,7 @@ public class UniversityController implements UniversityOperation {
   private final UniversityService universityService;
   private final CircuitBreaker circuitBreaker = CircuitBreaker.ofDefaults("apiCircuitBreaker");
 
-  public ResponseEntity<University> getUniversityById(@PathVariable Long id) throws EntityNotFound {
+  public ResponseEntity<University> getUniversityById(@PathVariable Integer id) throws EntityNotFound {
     return circuitBreaker.executeSupplier(() -> {
               try {
                 return ResponseEntity.ok().body(universityService.getById(id));
@@ -34,7 +34,7 @@ public class UniversityController implements UniversityOperation {
     });
   }
 
-  public ResponseEntity<String> deleteUniversityById(@PathVariable Long id) throws EntityNotFound {
+  public ResponseEntity<String> deleteUniversityById(@PathVariable Integer id) throws EntityNotFound {
     return circuitBreaker.executeSupplier(() -> {
       try {
         universityService.deleteById(id);
@@ -45,7 +45,7 @@ public class UniversityController implements UniversityOperation {
     });
   }
 
-  public ResponseEntity<String> updateUniversity(@PathVariable Long id, @RequestBody University University) throws EntityNotFound {
+  public ResponseEntity<String> updateUniversity(@PathVariable Integer id, @RequestBody University University) throws EntityNotFound {
     return circuitBreaker.executeSupplier(() -> {
       try {
         University university = universityService.getById(id);

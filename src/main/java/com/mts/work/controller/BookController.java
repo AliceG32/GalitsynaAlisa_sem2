@@ -23,7 +23,7 @@ public class BookController implements BookOperation {
   @Override
   @RateLimiter(name = "defaultRateLimiter")
   @CircuitBreaker(name = "defaultCircuitBreaker", fallbackMethod = "fallbackMethod")
-  public ResponseEntity<Book> getBookById(@PathVariable Long id) throws EntityNotFound {
+  public ResponseEntity<Book> getBookById(@PathVariable Integer id) throws EntityNotFound {
     return ResponseEntity.ok().body(bookService.getById(id));
   }
 
@@ -35,16 +35,16 @@ public class BookController implements BookOperation {
   }
 
   @Override
-  public ResponseEntity<String> deleteBookById(@PathVariable Long id) throws EntityNotFound {
+  public ResponseEntity<String> deleteBookById(@PathVariable Integer id) throws EntityNotFound {
     bookService.deleteById(id);
     return new ResponseEntity<>("Book deleted! ID: " + id, HttpStatus.OK);
   }
 
     @Override
-    public ResponseEntity<String> updateBook(@PathVariable Long id, @RequestBody Book Book) throws EntityNotFound {
+    public ResponseEntity<String> updateBook(@PathVariable Integer id, @RequestBody Book Book) throws EntityNotFound {
         Book book = bookService.getById(id);
         Book.setId(book.getId());
-        Book.setUserId(book.getUserId());
+        //Book.setUserId(book.getUserId());
         bookService.update(Book);
         return new ResponseEntity<>("Book updated! ID: " + id, HttpStatus.OK);
     }

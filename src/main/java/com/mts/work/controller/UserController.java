@@ -6,15 +6,13 @@ import com.mts.work.service.UserService;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -28,26 +26,25 @@ public class UserController implements UserOperation {
   private final RateLimiter rateLimiter = RateLimiter.ofDefaults("apiRateLimiter");
 
   @Override
-  @Cacheable(value = "UserControllerUserCache", key = "#id")
-  public ResponseEntity<User> getUserById(@PathVariable Long id) {
+  public ResponseEntity<User> getUserById(@PathVariable Integer id) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
       try {
         return ResponseEntity.ok().body(userService.getById(id));
       } catch (EntityNotFound e) {
-        throw new RuntimeException(e);
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
       }
     }));
   }
 
   @Override
-  public User getUserByIdRestTemplate(Long id) throws EntityNotFound {
+  public User getUserByIdRestTemplate(Integer id) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
       return restTemplate.getForObject("http://localhost:8080/user/" + id, User.class);
     }));
   }
 
   @Override
-  public User getUserByIdWebClient(Long id) throws EntityNotFound {
+  public User getUserByIdWebClient(Integer id) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
       return webClient.get().uri("http://localhost:8080/user/" + id).retrieve().bodyToMono(User.class).block();
     }));
@@ -62,33 +59,25 @@ public class UserController implements UserOperation {
   }
 
   @Override
-  @CacheEvict(value = "UserControllerUserCache", key = "#id")
-  public ResponseEntity<String> deleteUserById(@PathVariable Long id) throws EntityNotFound {
+  public ResponseEntity<String> deleteUserById(@PathVariable Integer id) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
       try {
         userService.deleteById(id);
       } catch (EntityNotFound e) {
-        throw new RuntimeException(e);
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
       }
       return new ResponseEntity<>("User deleted! ID: " + id, HttpStatus.OK);
     }));
   }
 
   @Override
-  @CachePut(value = "UserControllerUserCache", key = "#id")
-  public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User User) throws EntityNotFound {
+  public ResponseEntity<String> updateUser(@PathVariable Integer id, @RequestBody User user) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
-      User user = null;
       try {
-        user = userService.getById(id);
+        user.setId(id);
+        userService.update(user);
       } catch (EntityNotFound e) {
-        throw new RuntimeException(e);
-      }
-      User.setId(user.getId());
-      try {
-        userService.update(User);
-      } catch (EntityNotFound e) {
-        throw new RuntimeException(e);
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
       }
       return new ResponseEntity<>("User updated! ID: " + id, HttpStatus.OK);
     }));

@@ -21,19 +21,19 @@ public interface UserOperation {
     @Operation(summary = "Получить пользователя по ID")
     @ApiResponse(responseCode = "200", description = "Пользователь найден")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-    ResponseEntity<User> getUserById(@PathVariable Long id) throws EntityNotFound;
+    ResponseEntity<User> getUserById(@PathVariable Integer id) throws EntityNotFound;
 
     @GetMapping("/rest-template/{id}")
     @Operation(summary = "Получить пользователя по ID (RestTemplate)")
     @ApiResponse(responseCode = "200", description = "Пользователь найден")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-    User getUserByIdRestTemplate(@PathVariable Long id) throws EntityNotFound;
+    User getUserByIdRestTemplate(@PathVariable Integer id) throws EntityNotFound;
 
     @GetMapping("/web-client/{id}")
     @Operation(summary = "Получить пользователя по ID (WebClient)")
     @ApiResponse(responseCode = "200", description = "Пользователь найден")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-    User getUserByIdWebClient(@PathVariable Long id) throws EntityNotFound;
+    User getUserByIdWebClient(@PathVariable Integer id) throws EntityNotFound;
 
     @PostMapping("")
     @Operation(summary = "Создать пользователя по ID")
@@ -44,11 +44,11 @@ public interface UserOperation {
     @Operation(summary = "Удалить пользователя по ID")
     @ApiResponse(responseCode = "200", description = "Пользователь удален")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-    ResponseEntity<String> deleteUserById(@PathVariable Long id) throws EntityNotFound;
+    ResponseEntity<String> deleteUserById(@PathVariable Integer id) throws EntityNotFound;
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменить пользователя по ID")
     @ApiResponse(responseCode = "200", description = "Пользователь изменен")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-    ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User User) throws EntityNotFound;
+    ResponseEntity<String> updateUser(@PathVariable Integer id, @RequestBody User User) throws EntityNotFound;
 }
