@@ -1,7 +1,10 @@
 package com.mts.work.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mts.work.entity.User;
+import com.mts.work.kafka.DtoMessage;
 import com.mts.work.repository.exception.EntityNotFound;
+import com.mts.work.service.KafkaProducerService;
 import com.mts.work.service.UserService;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.UUID;
 
 
 @RestController
@@ -51,33 +56,43 @@ public class UserController implements UserOperation {
   }
 
   @Override
-  public ResponseEntity<String> saveUser(@RequestBody User user) {
+  public ResponseEntity<String> saveUser(@RequestBody User user, @RequestHeader("userId") String header) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
-      long id = userService.create(user);
+      long id = 0;
+      try {
+        id = userService.create(user, header);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
       return new ResponseEntity<>("User created! ID: " + id, HttpStatus.CREATED);
     }));
   }
 
   @Override
-  public ResponseEntity<String> deleteUserById(@PathVariable Integer id) {
+  public ResponseEntity<String> deleteUserById(@PathVariable Integer id, @RequestHeader("userId") String header) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
+
       try {
-        userService.deleteById(id);
+        userService.deleteById(id, header);
       } catch (EntityNotFound e) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
       }
       return new ResponseEntity<>("User deleted! ID: " + id, HttpStatus.OK);
     }));
   }
 
   @Override
-  public ResponseEntity<String> updateUser(@PathVariable Integer id, @RequestBody User user) {
+  public ResponseEntity<String> updateUser(@PathVariable Integer id, @RequestBody User user, @RequestHeader("userId") String header) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
       try {
         user.setId(id);
-        userService.update(user);
+        userService.update(user, header);
       } catch (EntityNotFound e) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
       }
       return new ResponseEntity<>("User updated! ID: " + id, HttpStatus.OK);
     }));
