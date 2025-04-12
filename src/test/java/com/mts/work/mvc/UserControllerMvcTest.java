@@ -35,7 +35,7 @@ class UserControllerMvcTest {
     @Test
     public void getUser() throws Exception {
         Integer id = 0;
-        doReturn(id).when(userService).create(USER_MOCK);
+        doReturn(id).when(userService).create(USER_MOCK, "bbcc4621-d88f-4a94-ae2f-b38072bf5087");
         mockMvc.perform(get("/user/1").contentType("application/json"))
                 .andExpect(status().isOk());
     }

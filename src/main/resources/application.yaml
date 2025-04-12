@@ -17,6 +17,9 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: validate
+  kafka:
+    bootstrap-servers: localhost:29093
+
 management:
   endpoints:
     web:
@@ -45,3 +48,4 @@ resilience4j:
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10s
 
+topic-to-send-message: mts-topic
