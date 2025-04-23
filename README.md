@@ -1,1 +1,2 @@
-# GalitsynaAlisa_sem2
+# Галицына Алиса 2 семестр 
+Скриншоты в папке screenshots
