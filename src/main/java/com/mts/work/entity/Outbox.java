@@ -12,24 +12,23 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.AbstractAggregateRoot;
 
 @Data
 @Entity
-@Table(name = "users", schema = "public")
+@Table(name = "outbox", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSeqGen")
-    @SequenceGenerator(name = "userSeqGen", sequenceName = "users_id_seq",  allocationSize = 1)
-    @JsonIgnore
-    @Hidden
-    private Integer id;
-    @NotNull(message = "Name can not be NULL")
-    private String name;
+public class Outbox {
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outboxSeqGen")
+  @SequenceGenerator(name = "outboxSeqGen", sequenceName = "outbox_id_seq",  allocationSize = 1)
+  @JsonIgnore
+  @Hidden
+  private Integer id;
+  @NotNull(message = "Data can not be NULL")
+  private String data;
 
-    public User(String userName) {
-        this.name = userName;
-    }
+  public Outbox(String data) {
+    this.data = data;
+  }
 }

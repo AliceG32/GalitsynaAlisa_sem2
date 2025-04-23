@@ -1,10 +1,14 @@
 package com.mts.work.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mts.work.entity.Outbox;
 import com.mts.work.entity.User;
 import com.mts.work.kafka.DtoMessage;
+import com.mts.work.repository.OutboxRepository;
 import com.mts.work.repository.UserRepository;
 import com.mts.work.repository.exception.EntityNotFound;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +23,8 @@ import java.util.UUID;
 @Slf4j
 public class UserService {
   private final UserRepository repository;
-  private final KafkaProducerService kafkaProducerService;
+  private final OutboxRepository outboxRepository;
+  private final ObjectMapper objectMapper;
 
   public List<User> getAll() {
     return repository.findAll();
@@ -32,14 +37,18 @@ public class UserService {
     return optionalItem.get();
   }
 
+  @Transactional
   public Integer create(User User, String userId) throws JsonProcessingException {
     User savedItem = repository.save(User);
-    kafkaProducerService.sendMessage(
-            new DtoMessage(
-                    UUID.fromString(userId),
-                    DtoMessage.Action.CREATE.toString(),
-                    "User created! ID: " + savedItem.getId())
-    );
+    outboxRepository.save(new Outbox(
+            objectMapper.writeValueAsString(
+                    new DtoMessage(
+                            UUID.fromString(userId),
+                            DtoMessage.Action.CREATE.toString(),
+                            "User created! ID: " + savedItem.getId()
+                    )
+            )
+    ));
     log.info("User with id: {} saved successfully", User.getId());
     return savedItem.getId();
   }
@@ -51,13 +60,16 @@ public class UserService {
       throw new EntityNotFound("User with id: " + user.getId() + " doesn't exist");
     }
     repository.save(user);
-    kafkaProducerService.sendMessage(
-            new DtoMessage(
-                    UUID.fromString(userId),
-                    DtoMessage.Action.UPDATE.toString(),
-                    "User updated! ID: " + user.getId()
+    outboxRepository.save(new Outbox(
+            objectMapper.writeValueAsString(
+                    new DtoMessage(
+                            UUID.fromString(userId),
+                            DtoMessage.Action.UPDATE.toString(),
+                            "User updated! ID: " + user.getId()
+                    )
             )
-    );
+    ));
+
     log.info("User with id: {} updated successfully", user.getId());
     return optionalItem;
   }
@@ -70,7 +82,14 @@ public class UserService {
     }
 
     repository.deleteById(id);
-
-    kafkaProducerService.sendMessage(new DtoMessage(UUID.fromString(userId), DtoMessage.Action.DELETE.toString(), "User deleted! ID: " + id));
+    outboxRepository.save(new Outbox(
+            objectMapper.writeValueAsString(
+                    new DtoMessage(
+                            UUID.fromString(userId),
+                            DtoMessage.Action.DELETE.toString(),
+                            "User deleted! ID: " + id
+                    )
+            )
+    ));
   }
 }
