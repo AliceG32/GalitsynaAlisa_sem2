@@ -2,13 +2,12 @@ package com.mts.work.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mts.work.entity.User;
-import com.mts.work.kafka.DtoMessage;
 import com.mts.work.repository.exception.EntityNotFound;
-import com.mts.work.service.KafkaProducerService;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import com.mts.work.service.UserService;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,11 +16,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.UUID;
-
 
 @RestController
-@RequiredArgsConstructor
 @Validated
 public class UserController implements UserOperation {
   private final UserService userService;
@@ -29,6 +25,10 @@ public class UserController implements UserOperation {
   private final WebClient webClient = WebClient.create();
   private final CircuitBreaker circuitBreaker = CircuitBreaker.ofDefaults("apiCircuitBreaker");
   private final RateLimiter rateLimiter = RateLimiter.ofDefaults("apiRateLimiter");
+
+  public UserController(UserService userService, MeterRegistry registry) {
+    this.userService = userService;
+  }
 
   @Override
   public ResponseEntity<User> getUserById(@PathVariable Integer id) {
@@ -55,6 +55,12 @@ public class UserController implements UserOperation {
     }));
   }
 
+  @Timed(
+          value = "add.user.request.duration",
+          description = "Add User HTTP requests duration",
+          percentiles = {0.5, 0.9, 0.99},
+          extraTags = {"type", "Add User"},
+          histogram = true)
   @Override
   public ResponseEntity<String> saveUser(@RequestBody User user, @RequestHeader("userId") String header) {
     return circuitBreaker.executeSupplier(() -> rateLimiter.executeSupplier(() -> {
@@ -64,6 +70,7 @@ public class UserController implements UserOperation {
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
+
       return new ResponseEntity<>("User created! ID: " + id, HttpStatus.CREATED);
     }));
   }
